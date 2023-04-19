@@ -1,7 +1,5 @@
 package Task;
-
 import Utilites.GeneratorUniqueNumber;
-
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -9,6 +7,7 @@ public class EpicTask extends Task {
     ArrayList<SubTask> subTasks;
     public String id;
     private GeneratorUniqueNumber generatorID;
+
     public EpicTask(String title, String description, ArrayList<SubTask> subTasks) {
 
         super(title, description, Status.NEW);
@@ -88,7 +87,6 @@ public class EpicTask extends Task {
         for (var item : subTasks){
             arrayOfTitles.add(item.getTitle());
         }
-
         return arrayOfTitles;
     }
 
