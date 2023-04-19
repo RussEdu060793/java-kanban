@@ -10,6 +10,7 @@ public class EpicTask extends Task {
     public String id;
     private GeneratorUniqueNumber generatorID;
     public EpicTask(String title, String description, ArrayList<SubTask> subTasks) {
+
         super(title, description, Status.NEW);
         this.generatorID = new GeneratorUniqueNumber();
         this.id = generatorID.generateUniqueID();
@@ -18,6 +19,7 @@ public class EpicTask extends Task {
     }
 
     public EpicTask(String title, String description) {
+
         super(title, description, Status.NEW);
         this.generatorID = new GeneratorUniqueNumber();
         this.id = generatorID.generateUniqueID();
@@ -26,6 +28,7 @@ public class EpicTask extends Task {
     }
 
     public EpicTask(String title, String description, String id) {
+
         super(title, description, Status.NEW);
         this.id = id;
         this.subTasks = new ArrayList<>();
@@ -33,6 +36,7 @@ public class EpicTask extends Task {
     }
 
     public void updateEpicStatus(){
+
         if(isAllSubTasksDone()){
             setStatus(Status.DONE);
         }else {
@@ -58,6 +62,7 @@ public class EpicTask extends Task {
     }
 
     private boolean isHasProgressStatus(){
+
         if (subTasks.isEmpty()) {
             return false;
         }
@@ -71,11 +76,13 @@ public class EpicTask extends Task {
         return false;
     }
     public void addSubTask(SubTask subTask){
+
         subTasks.add(subTask);
         updateEpicStatus();
     }
 
     public ArrayList<String> printTitleSubTask(){
+
         ArrayList<String> arrayOfTitles = new ArrayList<>();
 
         for (var item : subTasks){
@@ -86,10 +93,12 @@ public class EpicTask extends Task {
     }
 
     public void printSubTask(){
+
         System.out.println(subTasks.toString());
     }
 
     public ArrayList<SubTask> getSubTasks(){
+
         return this.subTasks;
     }
 }

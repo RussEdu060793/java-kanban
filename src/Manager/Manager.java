@@ -14,12 +14,15 @@ public class Manager {
     public EpicTask  convertingTaskToEpic(Task task){
 
         EpicTask epicTask = new EpicTask(task.getTitle(),task.getDescription(), task.getId());
+
         deleteTaskByID(task.getId());
         return epicTask;
     }
 
     public void printListOfTask(List<Task> listTasks) {
+
         int index = 0;
+
         for (var item : listTasks) {
             System.out.println( (index+1) + ": "+item.getTitle());
             index++;
@@ -42,6 +45,7 @@ public class Manager {
     }
 
     public EpicTask getEpicTaskById(String id) {
+
         for (var item : filterEpic()) {
             if (item.getId().equals(id)) {
                 return item;
@@ -69,11 +73,14 @@ public class Manager {
     }
 
     public void  deleteTaskByID(String id){
+
         listTasks.remove(getTaskById(id));
     }
 
     public List<EpicTask> filterEpic() {
+
         List<EpicTask> epics = new ArrayList<>();
+
         for (Task task : listTasks) {
             if (task instanceof EpicTask) {
                 epics.add((EpicTask) task);
@@ -83,11 +90,14 @@ public class Manager {
     }
 
     public int getCountListOfTaskAndEpic(){
+
         return listTasks.size();
     }
 
     private List<SubTask> filterSubTask() {
+
         List<SubTask> subTasks = new ArrayList<>();
+
         for (Task task : listTasks) {
             if (task instanceof SubTask) {
                 subTasks.add((SubTask) task);
@@ -97,7 +107,9 @@ public class Manager {
     }
 
     public List<Task> filterNotSubTask() {
+
         List<Task> tasks = new ArrayList<>();
+
         for (Task task : listTasks) {
             if (!(task instanceof SubTask)) {
                 tasks.add(task);
@@ -107,6 +119,7 @@ public class Manager {
     }
 
     public void printNameEpicSubTask(EpicTask epicTask){
+
          for (var name : epicTask.getSubTasks()){
              System.out.println(name.getTitle());
          }
@@ -115,6 +128,7 @@ public class Manager {
     public void changeSubTaskStatus(String subTaskID, Task.Status status){
 
         var subTask = (SubTask) getTaskById(subTaskID);
+
         subTask.setStatus(status);
         subTask.epicTask.updateEpicStatus();
     }

@@ -2,7 +2,6 @@ import Manager.Manager;
 import Task.EpicTask;
 import Task.SubTask;
 import Task.Task;
-
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -11,6 +10,7 @@ public class ServiceControler {
     public static ServiceControler instance = new ServiceControler();
 
     public int isValidInput(Scanner scanner, int from, int to) {
+
         try {
             int input = scanner.nextInt();
             if (input >= from && input <= to) {
@@ -26,6 +26,7 @@ public class ServiceControler {
     }
 
     public String isValidSelection(Scanner scanner, String yes, String no) {
+
         try {
             String input = scanner.next();
             if (input.equals(yes) || input.equals(no)) {
@@ -40,6 +41,7 @@ public class ServiceControler {
     }
 
     public void createTask(Scanner scanner) {
+
         System.out.println("Напишите имя вашей задачи");
         String nameTask = scanner.next();
         System.out.println("Напишите описание для вашей задачи");
@@ -47,9 +49,7 @@ public class ServiceControler {
         System.out.println("Добавить в подзадачи? Y/N");
         var isEpic = isValidSelection(scanner, "Y", "N");
         if (isEpic.equals("Y")) {
-            ///проверяем что есть задачи или epic
             if (Manager.shared.filterNotSubTask().size() > 0) {
-                //выводим список задач которые не являются подзадачами
                 System.out.println("Выберите задачу в которой создать подзадачу");
                 Manager.shared.printListOfTask(Manager.shared.filterNotSubTask());
                 var indexTask = isValidInput(scanner, 1, Manager.shared.getCountListOfTaskAndEpic());
@@ -84,6 +84,7 @@ public class ServiceControler {
     }
 
     public void deleteTask(Scanner scanner) {
+
         if (Manager.shared.filterNotSubTask().size() == 0) {
             System.out.println("Нет задач которые можно удалить");
             return;
@@ -100,6 +101,7 @@ public class ServiceControler {
     }
 
     public void openTask(Scanner scanner) {
+
         if (Manager.shared.filterNotSubTask().size() == 0) {
             System.out.println("У вас нет задач");
             return;

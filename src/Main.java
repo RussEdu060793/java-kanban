@@ -1,7 +1,3 @@
-import Manager.Manager;
-import Task.EpicTask;
-import Task.SubTask;
-import Task.Task;
 import java.util.Scanner;
 
 public class Main {

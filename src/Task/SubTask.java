@@ -8,12 +8,14 @@ public class SubTask extends Task {
     private GeneratorUniqueNumber generatorID = new GeneratorUniqueNumber();
 
     public SubTask(String title, String description, Status status, EpicTask epicTask) {
+
         super(title, description, status);
         this.epicTask = epicTask;
         this.id = generatorID.generateUniqueID();
     }
 
     public SubTask(String title, String description, String id, EpicTask epicTask) {
+
         super(title, description, Status.NEW);
         this.epicTask = epicTask;
         this.id = id;

@@ -13,6 +13,7 @@ public class Task {
     }
 
     public Task(String title, String description, Status status) {
+
         this.title = title;
         this.description = description;
         this.id = generatorID.generateUniqueID();
@@ -24,30 +25,37 @@ public class Task {
     }
 
     public void setTitle(String title) {
+
         this.title = title;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     public String getId() {
+
         return id;
     }
 
     public void setId() {
+
         this.id = generatorID.generateUniqueID();
     }
 
     public Status getStatus() {
+
         return status;
     }
 
     public void setStatus(Status status) {
+
         this.status = status;
     }
 }
