@@ -37,7 +37,7 @@ public class EpicTask extends Task {
 
     public void updateEpicStatus(){
 
-        if(isAllSubTasksDone()){
+        if(isAllSubTasksDone()) {
             setStatus(Status.DONE);
         }else {
             if (isHasProgressStatus()){
