@@ -1,36 +1,106 @@
-import java.util.Scanner;
+import manager.Manager;
+import task.EpicTask;
+import task.Status;
+import task.SubTask;
+import task.Task;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        var scanner = new  Scanner(System.in);
-        int userInput = 0;
+        var manager = new Manager();
+        var index = 0;
 
-        while (true){
-            System.out.println("Выберите пункт меню");
-            printMenu();
-            userInput = ServiceControler.instance.isValidInput(scanner,1,3);
+        Task task1 = new Task("Heading1", "desc", Status.NEW);
+        Task task2 = new Task("Heading2", "desc", Status.NEW);
+        Task task3 = new Task("Heading3", "desc", Status.NEW);
 
-            switch (userInput){
-                case 0:
-                    return;
-                case 1:
-                   ServiceControler.instance.createTask(scanner);
-                   break;
-                case 2:
-                    ServiceControler.instance.openTask(scanner);
-                    break;
-                case 3:
-                    ServiceControler.instance.deleteTask(scanner);
-                    break;
-            }
+        manager.addNewTask(task1);
+        manager.addNewTask(task2);
+        manager.addNewTask(task3);
+
+        for (var row : manager.getTasks()) {
+            System.out.println((index + 1) + "я задача: " + row.getTitle());
+            index++;
         }
-    }
-   public static void printMenu(){
-        System.out.println("0: Выход");
-        System.out.println("1: Создать задачу");
-        System.out.println("2: Зайти в задачу");
-        System.out.println("3: Удалить задачу");
+        index = 0;
+        System.out.println("\n");
+
+        EpicTask epicTask1 = new EpicTask("EpicTitle1", "EpicDesc");
+        EpicTask epicTask2 = new EpicTask("EpicTitle2", "EpicDesc");
+        EpicTask epicTask3 = new EpicTask("EpicTitle3", "EpicDesc");
+
+        manager.addNewEpic(epicTask1);
+        manager.addNewEpic(epicTask2);
+        manager.addNewEpic(epicTask3);
+
+        for (var row : manager.getEpicTask()) {
+            System.out.println((index + 1) + "й эпик при создании имеет статус: " + row.getStatus());
+            index++;
+        }
+        index = 0;
+        System.out.println("\n");
+
+        SubTask subTask1 = new SubTask("Heading SubTask1", "Subtask desc", Status.NEW);
+        SubTask subTask2 = new SubTask("Heading SubTask2", "Subtask desc", Status.NEW);
+        SubTask subTask3 = new SubTask("Heading SubTask3", "Subtask desc", Status.NEW);
+        SubTask subTask4 = new SubTask("Heading SubTask4", "Subtask desc", Status.NEW);
+        SubTask subTask5 = new SubTask("Heading SubTask5", "Subtask desc", Status.NEW);
+
+        manager.addNewSubtask(subTask1);
+        manager.addNewSubtask(subTask2);
+        manager.addNewSubtask(subTask3);
+        manager.addNewSubtask(subTask4);
+        manager.addNewSubtask(subTask5);
+
+        for (var row : manager.getSubtasks()) {
+            System.out.println((index + 1) + " ЭПИК");
+            System.out.println((index + 1) + "я SubTask имеет заголовок: " + row.getTitle());
+            System.out.println((index + 1) + "я SubTask входит в состав Epic: " + row.getEpicId());
+            index++;
+        }
+        index = 0;
+        System.out.println("\n");
+
+        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask1.getId());
+        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask2.getId());
+        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask3.getId());
+        manager.addSubtaskIntoEpic(epicTask2.getId(), subTask4.getId());
+        manager.addSubtaskIntoEpic(epicTask3.getId(), subTask5.getId());
+
+        for (var row : manager.getSubtasks()) {
+            System.out.println((index + 1) + " ЭПИК");
+            System.out.println((index + 1) + "я SubTask имеет заголовок: " + row.getTitle());
+            System.out.println((index + 1) + "я SubTask входит в состав Epic: " + row.getEpicId());
+            System.out.println((index + 1) + "я SubTask статус: " + row.getStatus());
+            index++;
+        }
+        index = 0;
+        System.out.println("\n");
+
+        subTask1.setStatus(Status.DONE);
+        manager.updateSubtask(subTask1);
+        subTask2.setStatus(Status.NEW);
+        manager.updateSubtask(subTask2);
+        subTask3.setStatus(Status.NEW);
+        manager.updateSubtask(subTask3);
+
+        manager.updateEpicStatus(subTask1.getEpicId());
+        for (var row : manager.getEpicTask()) {
+            System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getTitle());
+            System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getStatus());
+            System.out.println("в эпике задач: " + manager.getEpicSubtasks(row.getId()).size());
+            index++;
+        }
+        index = 0;
+        System.out.println("\n");
+
+        manager.deleteSubtask(subTask1.getId());
+        for (var row : manager.getEpicTask()) {
+            System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getTitle());
+            System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getStatus());
+            System.out.println("в эпике задач: " + manager.getEpicSubtasks(row.getId()).size());
+            index++;
+        }
     }
 }
