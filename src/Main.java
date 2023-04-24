@@ -35,6 +35,7 @@ public class Main {
         manager.addNewEpic(epicTask3);
 
         for (var row : manager.getEpicTask()) {
+            System.out.println((index + 1) + "й эпик имеет имя: " + row.getTitle());
             System.out.println((index + 1) + "й эпик при создании имеет статус: " + row.getStatus());
             index++;
         }
@@ -47,11 +48,11 @@ public class Main {
         SubTask subTask4 = new SubTask("Heading SubTask4", "Subtask desc", Status.NEW);
         SubTask subTask5 = new SubTask("Heading SubTask5", "Subtask desc", Status.NEW);
 
-        manager.addNewSubtask(subTask1);
-        manager.addNewSubtask(subTask2);
-        manager.addNewSubtask(subTask3);
-        manager.addNewSubtask(subTask4);
-        manager.addNewSubtask(subTask5);
+        manager.addNewSubtask(subTask1, epicTask1.getId());
+        manager.addNewSubtask(subTask2, epicTask1.getId());
+        manager.addNewSubtask(subTask3, epicTask1.getId());
+        manager.addNewSubtask(subTask4, epicTask2.getId());
+        manager.addNewSubtask(subTask5, epicTask3.getId());
 
         for (var row : manager.getSubtasks()) {
             System.out.println((index + 1) + " ЭПИК");
@@ -62,11 +63,6 @@ public class Main {
         index = 0;
         System.out.println("\n");
 
-        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask1.getId());
-        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask2.getId());
-        manager.addSubtaskIntoEpic(epicTask1.getId(), subTask3.getId());
-        manager.addSubtaskIntoEpic(epicTask2.getId(), subTask4.getId());
-        manager.addSubtaskIntoEpic(epicTask3.getId(), subTask5.getId());
 
         for (var row : manager.getSubtasks()) {
             System.out.println((index + 1) + " ЭПИК");
@@ -85,7 +81,6 @@ public class Main {
         subTask3.setStatus(Status.NEW);
         manager.updateSubtask(subTask3);
 
-        manager.updateEpicStatus(subTask1.getEpicId());
         for (var row : manager.getEpicTask()) {
             System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getTitle());
             System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getStatus());
@@ -96,6 +91,7 @@ public class Main {
         System.out.println("\n");
 
         manager.deleteSubtask(subTask1.getId());
+
         for (var row : manager.getEpicTask()) {
             System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getTitle());
             System.out.println((index + 1) + "й эпик сейчас имеет статус: " + row.getStatus());

@@ -1,5 +1,5 @@
 package task;
-import utilites.GeneratorUniqueNumber;
+import utilites.UniqueNumberGenerator;
 
 public class Task {
     private String title;
@@ -10,7 +10,7 @@ public class Task {
     public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
-        this.id = GeneratorUniqueNumber.generatorUniqueNumber.generateUniqueID();
+        this.id = UniqueNumberGenerator.generateUniqueID();
         this.status = status;
     }
 
