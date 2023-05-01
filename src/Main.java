@@ -1,26 +1,32 @@
-import manager.Manager;
+import manager.InMemoryTaskManager;
 import task.EpicTask;
 import task.Status;
 import task.SubTask;
 import task.Task;
+import utilites.Managers;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        var manager = new Manager();
+        var manager = Managers.getDefault();
         var index = 0;
 
         Task task1 = new Task("Heading1", "desc", Status.NEW);
         Task task2 = new Task("Heading2", "desc", Status.NEW);
         Task task3 = new Task("Heading3", "desc", Status.NEW);
+        Task task4 = new Task("Heading4", "desc", Status.NEW);
 
         manager.addNewTask(task1);
         manager.addNewTask(task2);
         manager.addNewTask(task3);
+        manager.addNewTask(task4);
 
         for (var row : manager.getTasks()) {
+            manager.getTask(row.getId());
+            System.out.println(row.getId());
             System.out.println((index + 1) + "я задача: " + row.getTitle());
+
             index++;
         }
         index = 0;
@@ -98,5 +104,7 @@ public class Main {
             System.out.println("в эпике задач: " + manager.getEpicSubtasks(row.getId()).size());
             index++;
         }
+
+        manager.printViewedTask();
     }
 }
