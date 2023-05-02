@@ -43,6 +43,6 @@ public interface TaskManager {
     void deleteEpics();
 
     void printViewedTask();
+
+    List<Task> getHistory();
 }
-
-

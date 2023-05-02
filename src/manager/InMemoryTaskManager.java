@@ -1,4 +1,5 @@
 package manager;
+
 import task.Status;
 import java.util.HashMap;
 import java.util.Map;
@@ -6,10 +7,8 @@ import task.EpicTask;
 import task.Task;
 import task.SubTask;
 import utilites.Managers;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 
@@ -21,12 +20,12 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
-    public List<Task> getTasks(){
+    public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public List<SubTask> getSubtasks(){
+    public List<SubTask> getSubtasks() {
         return new ArrayList<>(subTasks.values());
     }
 
@@ -52,7 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (task != null) {
             historyManager.add(task);
         }
-        return tasks.get(id);
+        return task;
     }
 
     @Override
@@ -61,7 +60,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTask != null) {
             historyManager.add(subTask);
         }
-        return subTasks.get(id);
+        return subTask;
     }
 
     @Override
@@ -70,7 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epicTask != null) {
             historyManager.add(epicTask);
         }
-        return epicTasks.get(id);
+        return epicTask;
     }
 
     @Override
@@ -132,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpic(String epicID) {
-        for (var subtask : epicTasks.get(epicID).getidSubTasks()){
+        for (var subtask : epicTasks.get(epicID).getidSubTasks()) {
             deleteSubtask(subtask);
         }
         epicTasks.remove(epicID);
@@ -194,8 +193,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void printViewedTask(){
-        var history = historyManager.getHistory();
+    public void printViewedTask() {
+        var history = this.getHistory();
 
         var typeTask = history.stream()
                 .filter(task -> task.getClass() == Task.class)
@@ -213,5 +212,10 @@ public class InMemoryTaskManager implements TaskManager {
                 .collect(Collectors.toList());
 
         System.out.println("Подзадач просмотрено: " + typeSubtask.size());
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 }
