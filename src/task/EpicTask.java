@@ -1,4 +1,5 @@
 package task;
+
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -14,11 +15,11 @@ public class EpicTask extends Task {
         this.idSubTasks = new ArrayList<>();
     }
 
-    public ArrayList<String> getidSubTasks(){
+    public ArrayList<String> getidSubTasks() {
         return idSubTasks;
     }
 
-    public void addIDSubTask(String link){
+    public void addIDSubTask(String link) {
         idSubTasks.add(link);
     }
 
