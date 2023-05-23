@@ -30,11 +30,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     public ArrayList<Task> getTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
         Node current = last;
-        var index = 0;
-        while (current != null && index < 10) {
+        while (current != null) {
             tasks.add(current.task);
             current = current.prev;
-            index += 1;
         }
         return tasks;
     }
@@ -69,7 +67,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    class Node {
+    public void removeAll(){
+        taskMap.clear();
+    }
+
+    private class Node {
         private Task task;
         private Node prev;
         private Node next;

@@ -67,6 +67,8 @@ public class Main {
         printHistory(taskManager);
 
         taskManager.deleteEpic(taskManager.getEpic(epicTask1.getId()).getId());
+
+        taskManager.deleteEpics();
         printHistory(taskManager);
     }
 
