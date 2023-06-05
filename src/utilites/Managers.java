@@ -1,9 +1,6 @@
 package utilites;
 
-import manager.HistoryManager;
-import manager.InMemoryHistoryManager;
-import manager.InMemoryTaskManager;
-import manager.TaskManager;
+import manager.*;
 
 public class Managers {
     public static TaskManager getDefault() {
