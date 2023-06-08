@@ -52,4 +52,8 @@ public class Task {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    public Class<?> getType(){
+        return this.getClass();
+    }
 }

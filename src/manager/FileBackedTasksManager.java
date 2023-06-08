@@ -1,10 +1,11 @@
 package manager;
-import exepctions.ManagerLoadException;
+
+import Utilities.CSVTaskFormatter;
+import exceptions.ManagerLoadException;
 import task.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
@@ -28,21 +29,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             writer.newLine();
 
             for (Task task : getTasks()) {
-                writer.write(taskToString(task));
+                writer.write(CSVTaskFormatter.taskToString(task));
                 writer.newLine();
             }
             for (EpicTask epic : getEpicTask()) {
-                writer.write(taskToString(epic));
+                writer.write(CSVTaskFormatter.taskToString(epic));
                 writer.newLine();
             }
             for (SubTask subTask : getSubtasks()) {
-                writer.write(taskToString(subTask));
+                writer.write(CSVTaskFormatter.taskToString(subTask));
                 writer.newLine();
             }
 
             writer.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ManagerLoadException("Ошибка в сохранении данных");
         }
     }
 
@@ -51,62 +52,57 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
-                if (line.length()>1){
-                    Task task = fromString(line);
-                    if (task instanceof EpicTask) {
+                if (line.length() > 1) {
+                    Task task = CSVTaskFormatter.fromString(line);
+                    if (task.getType() == EpicTask.class) {
                         addNewEpicNoSave((EpicTask) task);
-                    } else if (task instanceof SubTask) {
+                    } else if (task.getType() == SubTask.class) {
                         addNewSubtaskNoSave((SubTask) task, ((SubTask) task).getEpicId());
                     } else {
                         addNewTaskNoSave(task);
                     }
-                }
-                else {
+                } else {
                     break;
                 }
             }
 
             while ((line = reader.readLine()) != null) {
-                var idTasks = historyFromString(line);
+                var idTasks = CSVTaskFormatter.historyFromString(line);
 
-                for (var item : idTasks){
-                    if (isTaskWithIdExists(TypeTask.Task,item)){
-                        historyManager.add(getTaskWithIdExists(TypeTask.Task,item));
+                for (var item : idTasks) {
+                    if (isTaskWithIdExists(TypeTask.Task, item)) {
+                        historyManager.add(getTaskWithIdExists(TypeTask.Task, item));
                     }
 
-                    if (isTaskWithIdExists(TypeTask.EpicTask,item)){
-                        historyManager.add(getTaskWithIdExists(TypeTask.EpicTask,item));
+                    if (isTaskWithIdExists(TypeTask.EpicTask, item)) {
+                        historyManager.add(getTaskWithIdExists(TypeTask.EpicTask, item));
                     }
 
-                    if (isTaskWithIdExists(TypeTask.SubTask,item)){
-                        historyManager.add(getTaskWithIdExists(TypeTask.EpicTask,item));
+                    if (isTaskWithIdExists(TypeTask.SubTask, item)) {
+                        historyManager.add(getTaskWithIdExists(TypeTask.EpicTask, item));
                     }
                 }
             }
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка загрузки файла");
         }
     }
 
-    public boolean isTaskWithIdExists(TypeTask typeTask, String targetId) {
-        switch (typeTask){
+    private boolean isTaskWithIdExists(TypeTask typeTask, String targetId) {
+        switch (typeTask) {
             case Task:
-                for (var obj : getTasks()) {
-                    if (obj.getId().equals(targetId)) {
-                        return true;
-                    }
+                if (tasks.containsKey(targetId)) {
+                    return true;
                 }
                 break;
             case EpicTask:
-                for (var obj : getEpicTask()) {
-                    if (obj.getId().equals(targetId)) {
-                        return true;
-                    }
+                if (epicTasks.containsKey(targetId)) {
+                    return true;
                 }
                 break;
             case SubTask:
-                for (var obj : getSubtasks()) {
-                    if (obj.getId().equals(targetId)) {
-                        return true;
-                    }
+                if (subTasks.containsKey(targetId)) {
+                    return true;
                 }
                 break;
         }
@@ -114,109 +110,27 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return false;
     }
 
-    public Task getTaskWithIdExists(TypeTask typeTask, String targetId) {
-        switch (typeTask){
+    private Task getTaskWithIdExists(TypeTask typeTask, String targetId) {
+        switch (typeTask) {
             case Task:
-                for (var obj : getTasks()) {
-                    if (obj.getId().equals(targetId)) {
-                        return obj;
-                    }
+                if (tasks.containsKey(targetId)) {
+                    return tasks.get(targetId);
                 }
                 break;
             case EpicTask:
-                for (var obj : getEpicTask()) {
-                    if (obj.getId().equals(targetId)) {
-                        return obj;
-                    }
+                if (epicTasks.containsKey(targetId)) {
+                    return epicTasks.get(targetId);
                 }
                 break;
             case SubTask:
-                for (var obj : getSubtasks()) {
-                    if (obj.getId().equals(targetId)) {
-                        return obj;
-                    }
+                if (subTasks.containsKey(targetId)) {
+                    return subTasks.get(targetId);
                 }
                 break;
         }
         return null;
     }
 
-    public Task fromString(String value){
-        Task task = null;
-        String[] fields = value.split(",");
-        String id = fields[0];
-        TypeTask type = TypeTask.valueOf(fields[1]);
-        String name = fields[2];
-        Status status = Status.valueOf(fields[3]);
-        String description = fields[4];
-        String epicId = "";
-
-        if (type == TypeTask.SubTask) {
-            epicId = fields[5];
-        }
-
-        switch (type) {
-            case Task:
-                task = new Task(name,description,status);
-                task.setId(id);
-                break;
-            case EpicTask:
-                task = new EpicTask(name,description);
-                task.setId(id);
-                break;
-            case SubTask:
-                SubTask subTask = new SubTask(name,description,Status.NEW);
-                subTask.setId(id);
-                subTask.setEpicId(epicId);
-                task = subTask;
-                break;
-        }
-        return task;
-    }
-
-    private String taskToString(Task task) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(task.getId()).append(",");
-        sb.append(getTypeTask(task)).append(",");
-        sb.append(task.getTitle()).append(",");
-        sb.append(task.getStatus()).append(",");
-        sb.append(task.getDescription()).append(",");
-        if (task instanceof SubTask) {
-            SubTask subTask = (SubTask) task;
-            sb.append(subTask.getEpicId());
-        }
-        return sb.toString();
-    }
-
-    private TypeTask getTypeTask(Task task){
-        if (task instanceof EpicTask) {
-            return TypeTask.EpicTask;
-        } else if (task instanceof SubTask) {
-            return TypeTask.SubTask;
-        }else {
-            return TypeTask.Task;
-        }
-    }
-
-    static String historyToString(HistoryManager manager){
-        var tasks = manager.getTasks();
-        var line = "";
-        for (var task : tasks){
-            line = task.getId() + ", ";
-        }
-        return line;
-    }
-
-    static List<String> historyFromString(String value){
-         var line = value.split(",");
-         List<String> listID = new ArrayList<>();
-         for (var item : line){
-             if(item.length()>1) {
-                 listID.add(item);
-             }
-         }
-         return listID;
-    }
 
     @Override
     public String addNewTask(Task task) {
@@ -311,6 +225,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         appendIdToFile(id);
         return task;
     }
+
     @Override
     public SubTask getSubtask(String id) {
         SubTask subTask = super.getSubtask(id);
@@ -341,7 +256,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(id + ",");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ManagerLoadException("Ошибка добавления в файл");
         }
     }
 
@@ -361,7 +276,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         manager1.getTask(task1.getId());
         manager1.getTask(task2.getId());
         manager1.getEpic(epic1.getId());
-
 
         FileBackedTasksManager manager2 = new FileBackedTasksManager("tasks.csv");
         System.out.println("Количество задач в менеджере историй" + manager2.historyManager.getTasks());
