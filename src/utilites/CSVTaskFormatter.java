@@ -42,12 +42,13 @@ public class CSVTaskFormatter {
 
     public static String taskToString(Task task) {
         StringBuilder sb = new StringBuilder();
-        sb.append(task.getId()).append(",");
-        sb.append(getTypeTask(task)).append(",");
-        sb.append(task.getTitle()).append(",");
-        sb.append(task.getStatus()).append(",");
-        sb.append(task.getDescription()).append(",");
-        if (task instanceof SubTask) {
+        sb
+        .append(task.getId()).append(",")
+        .append(getTypeTask(task)).append(",")
+        .append(task.getTitle()).append(",")
+        .append(task.getStatus()).append(",")
+        .append(task.getDescription()).append(",");
+        if (task.getType() == TypeTask.SubTask) {
             SubTask subTask = (SubTask) task;
             sb.append(subTask.getEpicId());
         }
@@ -75,9 +76,9 @@ public class CSVTaskFormatter {
     }
 
     private static TypeTask getTypeTask(Task task) {
-        if (task.getType() == EpicTask.class) {
+        if (task.getType() == TypeTask.EpicTask) {
             return TypeTask.EpicTask;
-        } else if (task.getType() == SubTask.class) {
+        } else if (task.getType() == TypeTask.SubTask) {
             return TypeTask.SubTask;
         } else {
             return TypeTask.Task;

@@ -53,7 +53,14 @@ public class Task {
         this.status = status;
     }
 
-    public Class<?> getType(){
-        return this.getClass();
+    public TypeTask getType(){
+        if (this.getClass().equals(Task.class)) {
+            return TypeTask.Task;
+        } else if (this.getClass().equals(EpicTask.class)) {
+            return TypeTask.EpicTask;
+        } else if (this.getClass().equals(SubTask.class)) {
+            return TypeTask.SubTask;
+        }
+        return TypeTask.Task;
     }
 }

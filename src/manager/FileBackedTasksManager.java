@@ -1,6 +1,7 @@
 package manager;
 
-import Utilities.CSVTaskFormatter;
+import exceptions.LoadFileExeption;
+import utilites.CSVTaskFormatter;
 import exceptions.ManagerLoadException;
 import task.*;
 import java.io.*;
@@ -12,7 +13,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final String filePath;
 
-    public FileBackedTasksManager(String filePath) throws ManagerLoadException {
+    public FileBackedTasksManager(String filePath) {
         this.filePath = filePath;
         try {
             if (Files.exists(Paths.get(filePath))) {
@@ -42,21 +43,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
 
             writer.newLine();
+
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка в сохранении данных");
         }
     }
 
-    private void loadFromFile(String filePath) throws IOException {
+    private void loadFromFile(String filePath) throws LoadFileExeption {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 if (line.length() > 1) {
                     Task task = CSVTaskFormatter.fromString(line);
-                    if (task.getType() == EpicTask.class) {
+                    if (task.getType() == TypeTask.EpicTask) {
                         addNewEpicNoSave((EpicTask) task);
-                    } else if (task.getType() == SubTask.class) {
+                    } else if (task.getType() == TypeTask.SubTask) {
                         addNewSubtaskNoSave((SubTask) task, ((SubTask) task).getEpicId());
                     } else {
                         addNewTaskNoSave(task);
@@ -84,7 +86,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка загрузки файла");
+            throw new LoadFileExeption("Ошибка загрузки файла");
         }
     }
 
