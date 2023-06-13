@@ -26,4 +26,9 @@ public class EpicTask extends Task {
     public void removeSubtask(String subtaskId) {
         idSubTasks.remove(idSubTasks.indexOf(subtaskId));
     }
+
+    @Override
+    public TypeTask getType(){
+        return TypeTask.EpicTask;
+    }
 }

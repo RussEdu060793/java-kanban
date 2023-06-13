@@ -28,4 +28,9 @@ public class SubTask extends Task {
                 ", status=" + getStatus() +
                 '}';
     }
+
+    @Override
+    public TypeTask getType(){
+        return TypeTask.SubTask;
+    }
 }

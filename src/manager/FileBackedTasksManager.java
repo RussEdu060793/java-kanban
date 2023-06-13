@@ -43,7 +43,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
 
             writer.newLine();
-
+            saveHistory();
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка в сохранении данных");
         }
@@ -257,6 +257,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private void appendIdToFile(String id) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(id + ",");
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка добавления в файл");
+        }
+    }
+
+    private void saveHistory() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            for (Task task : historyManager.getTasks()) {
+                writer.write(task.getId() + ",");
+            }
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка добавления в файл");
         }
