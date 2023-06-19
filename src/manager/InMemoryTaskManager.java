@@ -1,24 +1,16 @@
 package manager;
 
-import task.Status;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import task.EpicTask;
-import task.Task;
-import task.SubTask;
+import task.*;
+import java.time.ZoneId;
+import java.util.*;
 import utilites.Managers;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class InMemoryTaskManager implements TaskManager {
+    protected final TreeMap<String, Task> tasks = new TreeMap<>();
+    protected final TreeMap<String, SubTask> subTasks = new TreeMap<>();
+    protected final TreeMap<String, EpicTask> epicTasks = new TreeMap<>();
 
-    protected final Map<String, Task> tasks = new HashMap<>();
-    protected final Map<String, SubTask> subTasks = new HashMap<>();
-    protected final Map<String, EpicTask> epicTasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
@@ -50,6 +42,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(String id) {
         Task task = tasks.get(id);
+
+        if (task == null){
+            throw new IllegalArgumentException("Task ID can't be found");
+        }
+
         if (task != null) {
             historyManager.add(task);
         }
@@ -59,6 +56,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask getSubtask(String id) {
         SubTask subTask = subTasks.get(id);
+        if(subTask == null){
+            throw new IllegalArgumentException("SubTask ID can't be found");
+        }
         if (subTask != null) {
             historyManager.add(subTask);
         }
@@ -68,6 +68,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public EpicTask getEpic(String id) {
         EpicTask epicTask = epicTasks.get(id);
+        if(epicTask == null){
+            throw new IllegalArgumentException("Epic ID can't be found");
+        }
         if (epicTask != null) {
             historyManager.add(epicTask);
         }
@@ -76,7 +79,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public String addNewTask(Task task) {
+
         String taskId = task.getId();
+        if (taskId == null || taskId == "") {
+            throw new IllegalArgumentException("Task ID can't be null or empty");
+        }
+
+        List<Task> prioritizedTasks = getPrioritizedTasks(TypeTask.Task);
+        for (Task existingTask : prioritizedTasks) {
+            if (tasksIntersect(task, existingTask)) {
+                throw new IllegalArgumentException("The new task conflicts with existing tasks");
+            }
+        }
         tasks.put(taskId, task);
         return taskId;
     }
@@ -84,6 +98,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public String addNewEpic(EpicTask epic) {
         String epicId = epic.getId();
+        if (epicId == null || epicId == "") {
+            throw new IllegalArgumentException("Task ID can't be null or empty");
+        }
+
+        List<Task> prioritizedTasks = getPrioritizedTasks(TypeTask.EpicTask);
+        for (Task existingTask : prioritizedTasks) {
+            if (tasksIntersect(epic, existingTask)) {
+                throw new IllegalArgumentException("The new task conflicts with existing tasks");
+            }
+        }
+
         epicTasks.put(epicId, epic);
         return epicId;
     }
@@ -91,6 +116,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public String addNewSubtask(SubTask subtask, String epicID) {
         String subtaskId = subtask.getId();
+        if (subtaskId == null || subtaskId == "") {
+            throw new IllegalArgumentException("SubTask ID can't be null or empty");
+        }
+
+        List<Task> prioritizedTasks = getPrioritizedTasks(TypeTask.SubTask);
+        for (Task existingTask : prioritizedTasks) {
+            if (tasksIntersect(subtask, existingTask)) {
+                throw new IllegalArgumentException("The new task conflicts with existing tasks");
+            }
+        }
+
         subTasks.put(subtaskId, subtask);
         if (epicTasks.containsKey(epicID)) {
             epicTasks.get(epicID).addIDSubTask(subtaskId);
@@ -237,5 +273,37 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getTasks();
+    }
+    @Override
+    public List<Task> getPrioritizedTasks(TypeTask type) {
+        List<Task> sortedTasks;
+        switch (type) {
+            case Task:
+                sortedTasks = new ArrayList<>(getTasks());
+                break;
+            case SubTask:
+                sortedTasks = new ArrayList<>(getSubtasks());
+                break;
+            case EpicTask:
+                sortedTasks = new ArrayList<>(getSubtasks());
+                break;
+            default: sortedTasks = new ArrayList<>();
+        }
+        sortedTasks.sort(Comparator.comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder())));
+
+        return sortedTasks;
+    }
+
+    private boolean tasksIntersect(Task task1, Task task2) {
+        if (task1.getStartTime() == null || task2.getStartTime() == null) {
+            return false;
+        }
+        ZoneId zone = ZoneId.systemDefault();
+        long task1Start = task1.getStartTime().atZone(zone).toInstant().toEpochMilli();
+        long task1End = task1Start + task1.getDuration() * 60000;
+        long task2Start = task2.getStartTime().atZone(zone).toInstant().toEpochMilli();
+        long task2End = task2Start + task2.getDuration() * 60000;
+
+        return task1Start < task2End && task1End > task2Start;
     }
 }

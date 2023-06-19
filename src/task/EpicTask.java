@@ -1,5 +1,8 @@
 package task;
 
+import manager.TaskManager;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -30,5 +33,30 @@ public class EpicTask extends Task {
     @Override
     public TypeTask getType(){
         return TypeTask.EpicTask;
+    }
+
+
+    public int getDuration(TaskManager taskManager) {
+        int totalDuration = 0;
+        for (String subtaskId : idSubTasks) {
+            SubTask subtask = taskManager.getSubtask(subtaskId);
+            totalDuration += subtask.getDuration();
+        }
+        return totalDuration;
+    }
+
+    public LocalDateTime getStartTime(TaskManager taskManager) {
+        LocalDateTime earliestTime = LocalDateTime.MAX;
+        for (String subtaskId : idSubTasks) {
+            SubTask subtask = taskManager.getSubtask(subtaskId);
+            if (subtask.getStartTime().isBefore(earliestTime)) {
+                earliestTime = subtask.getStartTime();
+            }
+        }
+        return earliestTime;
+    }
+
+    public LocalDateTime getEndTime(TaskManager taskManager) {
+        return getStartTime(taskManager).plusMinutes(getDuration(taskManager));
     }
 }

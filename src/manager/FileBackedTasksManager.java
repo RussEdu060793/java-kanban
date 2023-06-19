@@ -7,6 +7,7 @@ import task.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
@@ -24,7 +25,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() {
+
+    protected void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write("id,type,name,status,description,epic");
             writer.newLine();
@@ -81,7 +83,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     }
 
                     if (isTaskWithIdExists(TypeTask.SubTask, item)) {
-                        historyManager.add(getTaskWithIdExists(TypeTask.EpicTask, item));
+                        historyManager.add(getTaskWithIdExists(TypeTask.SubTask, item));
                     }
                 }
             }
@@ -275,21 +277,33 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static void main() throws ManagerLoadException {
         FileBackedTasksManager manager1 = new FileBackedTasksManager("tasks.csv");
 
-        Task task1 = new Task("Task 1", "Description 1", Status.NEW);
-        Task task2 = new Task("Task 2", "Description 2", Status.NEW);
+        Task task1 = new Task("Task1", "Description", Status.NEW, 160, LocalDateTime.now());
+        Task task2 = new Task("Task2", "Description", Status.NEW, 60, LocalDateTime.of(2023,07,6,12,00));
         EpicTask epic1 = new EpicTask("Epic 1", "Description 3");
-        SubTask subtask1 = new SubTask("Subtask 1", "Description 4", Status.NEW);
+        SubTask subtask1 = new SubTask("Subtask 1", "Description 4", Status.NEW, 60, LocalDateTime.of(2023,8,06,12,00));
+        SubTask subtask2 = new SubTask("Subtask 2", "Description 4", Status.NEW, 160, LocalDateTime.of(2023,8,7,12,00));
 
         manager1.addNewTask(task1);
         manager1.addNewTask(task2);
+
         manager1.addNewEpic(epic1);
         manager1.addNewSubtask(subtask1, epic1.getId());
+        manager1.addNewSubtask(subtask2, epic1.getId());
+
+        System.out.println("Время подзадачи: 1 " + manager1.getSubtask(subtask1.getId()).getDuration());
+        System.out.println("Время подзадачи: 2 " + manager1.getSubtask(subtask2.getId()).getDuration());
+        System.out.println("Время эпика: " + manager1.getEpic(epic1.getId()).getDuration(manager1));
+        System.out.println("Время завершения эпика: " + manager1.getEpic(epic1.getId()).getEndTime(manager1));
 
         manager1.getTask(task1.getId());
         manager1.getTask(task2.getId());
         manager1.getEpic(epic1.getId());
 
+        System.out.println("Просто список задач: " + manager1.getTasks());
+        System.out.println("Сортировка по приоритету: " + manager1.getPrioritizedTasks(TypeTask.Task));
+
         FileBackedTasksManager manager2 = new FileBackedTasksManager("tasks.csv");
         System.out.println("Количество задач в менеджере историй" + manager2.historyManager.getTasks());
+        System.out.println("Окончание эпика: " + manager2.getEpic(epic1.getId()).getEndTime(manager2));
     }
 }
